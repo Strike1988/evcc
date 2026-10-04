@@ -5,8 +5,8 @@ products:
       generic: Energy
 requirements:
   description:
-    de: Für Grid-Nutzung ist eine VRM-Instanz notwendig wenn Lastmanagement genutzt werden soll.
-    en: For grid usage, a grid meter VRM instance is require to enabled load management.
+    de: Für Grid-Nutzung ist eine VRM-Instanz notwendig, wenn Lastmanagement genutzt oder Zählerstände erfasst werden sollen.
+    en: For grid usage, a grid meter VRM instance is required to enable load management or meter readings.
 capabilities: ["battery-control"]
 discovery:
   hostname: ["venus"]
@@ -80,6 +80,24 @@ render: |
         type: input
         decode: int16
       scale: 0.1
+  energy:
+    source: modbus
+    {{- include "modbus-connection" . | indent 2 }}
+    id: {{ .meterid }}
+    register:
+      address: 2634 # total energy forward (import), 0.01 kWh
+      type: input
+      decode: uint32
+    scale: 0.01
+  returnenergy:
+    source: modbus
+    {{- include "modbus-connection" . | indent 2 }}
+    id: {{ .meterid }}
+    register:
+      address: 2636 # total energy reverse (export), 0.01 kWh
+      type: input
+      decode: uint32
+    scale: 0.01
   {{- end }}
   {{- end }}
   {{- if eq .usage "pv" }}
